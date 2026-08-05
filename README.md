@@ -34,4 +34,4 @@ Sebelum menggunakan tools ini, pastikan sistem Anda telah terinstal:
    $ bash setup.sh
 2. **Jalankan Dengan**
    ```bash
-   $ bash gas
+   $ ./gas
