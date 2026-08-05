@@ -2,7 +2,7 @@
 
 Alat otomatisasi ringan untuk membuat koneksi *reverse shell* secara instan menggunakan **Pinggy** sebagai alternatif gratis untuk Ngrok. Dirancang untuk pengujian penetrasi (*penetration testing*), audit keamanan internal, dan pembelajaran secara aman.
 
-![Banner Preview](https://via.placeholder.com/900x400/0d1117/58a6ff?text=Auto+Reverse+Shell+via+Pinggy)
+![Banner Preview](https://raw.githubusercontent.com/T-XpLoiT/RevShell/refs/heads/main/Screenshot_2026-08-05-15-59-43-547_com.termux-edit.jpg)
 
 ---
 
